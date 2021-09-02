@@ -1,5 +1,5 @@
 const Title =()=> {
-    return(
+    return (
         <div>
             <h1>Covid Tracker</h1>
         </div>
