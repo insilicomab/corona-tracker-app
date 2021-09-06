@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {Route, Switch, BrowserRouter} from "react-router-dom";
 import countriesJson from "./countries.json";
-import TopPage from './pages/TopPage';
-import './App.css';
+import TopPage from "./pages/TopPage";
+import WorldPage from "./pages/WorldPage";
+import "./App.css";
 
 function App() {
   const [country, setCountry] = useState("");
@@ -25,10 +27,23 @@ function App() {
     })
   }
 
+  const [allCountriesData, setAllCountriesData] = useState([]);
+
+  useEffect(()=>{
+      fetch('https://reactbook-corona-tracker-api.herokuapp.com/summary').then(res=>res.json()).then(data=>setAllCountriesData(data.Countries))
+  }, []);
+
   return (
-    <div>
-      <TopPage countriesJson={countriesJson} setCountry={setCountry} getCountryData={getCountryData} countryData={countryData} />
-    </div>
+    <BrowserRouter>
+      <Switch>
+        <Route exact path="/">
+          <TopPage countriesJson={countriesJson} setCountry={setCountry} getCountryData={getCountryData} countryData={countryData} />
+        </Route>
+        <Route exact path="/world">
+          <WorldPage allCountriesData={allCountriesData} />
+        </Route>
+      </Switch>
+    </BrowserRouter>
   );
 }
 
