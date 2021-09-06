@@ -6,6 +6,8 @@ import WorldPage from "./pages/WorldPage";
 import "./App.css";
 
 function App() {
+  const [loading, setLoading] = useState(false);
+
   const [country, setCountry] = useState("");
 
   const [countryData, setCountryData] = useState({
@@ -17,6 +19,7 @@ function App() {
   });
 
   const getCountryData =()=> {
+      setLoading(true);
       fetch(`https://api.covid19api.com/country/${country}`).then(res=>res.json()).then(data=>{setCountryData({
         date: data[data.length - 1].Date,
         newConfirmed: data[data.length - 1].Confirmed - data[data.length - 2].Confirmed,
@@ -24,20 +27,21 @@ function App() {
         newRecovered: data[data.length - 1].Recovered - data[data.length - 2].Recovered,
         totalRecovered: data[data.length - 1].Recovered,
       });
-    })
+      setLoading(false);
+    }).catch(error=>alert("エラーが発生しました。ページをリロードして、もう一度トライしてください。"));
   }
 
   const [allCountriesData, setAllCountriesData] = useState([]);
 
   useEffect(()=>{
       fetch('https://reactbook-corona-tracker-api.herokuapp.com/summary').then(res=>res.json()).then(data=>setAllCountriesData(data.Countries))
-  }, []);
+      .catch(error=>alert("エラーが発生しました。ページをリロードして、もう一度トライしてください。"))}, []);
 
   return (
     <BrowserRouter>
       <Switch>
         <Route exact path="/">
-          <TopPage countriesJson={countriesJson} setCountry={setCountry} getCountryData={getCountryData} countryData={countryData} />
+          <TopPage countriesJson={countriesJson} setCountry={setCountry} getCountryData={getCountryData} countryData={countryData} loading={loading} />
         </Route>
         <Route exact path="/world">
           <WorldPage allCountriesData={allCountriesData} />
